@@ -15,6 +15,18 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
-    
 
-    
+class EmployeeSchedule(db.Model):
+    __tablename__ = 'employee_schedules'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    entry_time = db.Column(db.Time, nullable=False)
+    exit_time = db.Column(db.Time, nullable=False)
+
+    user = db.relationship('User', backref='schedules')
+
+    def __repr__(self):
+        return f'<EmployeeSchedule {self.user_id} {self.date}>'
+
+

@@ -1,11 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <title>Admin</title>
-</head>
+    <meta charset="UTF-8">
+    <title>Painel Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    </head>
 <body>
-   <h1>Painel Admin</h1>
-   <p>Bem-vindo ao painel de administração!</p>
+    <header>
+        <div class="menu-btn" id="menuicn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logosec">
+            <div class="logo">Sistema Ponto</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+            <span class="user-icon">👤</span>
+            <span class="user-name">{{ username }}</span>
+            <div class="user-dropdown" id="userDropdown">
+                <form method="POST" action="{{ url_for('main.logout') }}">
+                    <button type="submit" class="logout-btn">Sair</button>
+                </form>
+            </div>
+        </div>
+    </header>
+    <!-- Menu lateral -->
+    <div class="main-container">
+        <div class="navcontainer">
+            <nav class="nav">
+                <div class="nav-upper-options">
+                    <a href="{{ url_for('main.register_employees') }}" class="nav-option option1">
+                        <span>👤</span>
+                        <span>Cadastrar Funcionário</span>
+                    </a>
+                    <a href="{{ url_for('main.employee_schedule') }}" class="nav-option option2">
+                        <span>🕒</span>
+                        <span>Cadastrar Horário Funcionário</span>
+                    </a>
+                    <a href="#" class="nav-option option3">
+                        <span>📊</span>
+                        <span>Relatórios</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <div class="main">
+            <!-- Conteúdo principal aqui -->
+        </div>
+    </div>    
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>
