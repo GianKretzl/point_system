@@ -9,3 +9,11 @@ def home():
 @bp.route('/login')
 def login():
     return render_template('login.html')
+
+@bp.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@bp.route('/employee')
+def employee():
+    return render_template('employee.html')
