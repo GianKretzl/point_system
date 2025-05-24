@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <div class="ring">
+        <i style="--clr:#00ff0a;"></i>
+        <i style="--clr:#ff0057;"></i>
+        <i style="--clr:#fffd44;"></i>
+        <div class="login">
+            <h2>Bem-vindo ao Sistema Ponto <br> do Terceirão!<br> </h2>
+            <p>Faça login para continuar.</p>
+            <form action="/login" method="post" class="login-form">
+                <div class="inputBx">
+                    <input type="text" id="username" name="username" placeholder="Usuário" required>
+                </div>
+                <div class="inputBx">
+                    <input type="password" id="password" name="password" placeholder="Senha" required>
+                </div>
+                <div class="inputBx">
+                    <input type="submit" value="Entrar">
+                </div>
+            </form>
+            <div class="links">
+                <a href="#">Esqueceu a senha?</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
