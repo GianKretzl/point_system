@@ -14,19 +14,27 @@
             <h2>Bem-vindo ao Sistema Ponto <br> do Terceirão!<br> </h2>
             <p>Faça login para continuar.</p>
             <form action="/login" method="post" class="login-form">
+                {{ form.hidden_tag() }}
                 <div class="inputBx">
-                    <input type="text" id="username" name="username" placeholder="Usuário" required>
+                    {{ form.username(class_="input", id="username", placeholder="Usuário", required=True) }}
                 </div>
                 <div class="inputBx">
-                    <input type="password" id="password" name="password" placeholder="Senha" required>
+                    {{ form.password(class_="input", id="password", placeholder="Senha", required=True) }}
                 </div>
                 <div class="inputBx">
-                    <input type="submit" value="Entrar">
+                    {{ form.submit(class_="input") }}
                 </div>
             </form>
             <div class="links">
                 <a href="#">Esqueceu a senha?</a>
             </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
         </div>
     </div>
 </body>

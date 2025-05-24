@@ -4,6 +4,7 @@ from db import db
 from models import User
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '123456'
 app.register_blueprint(bp)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///point_system.db'
 db.init_app(app)
