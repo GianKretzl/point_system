@@ -234,6 +234,11 @@ header {
     font-size: 1.1em;
     color: var(--text);
 }
+.main h1,
+.main > p {
+    text-align: center;
+    margin-bottom: 24px;
+}
 
 .option1 {
     background: var(--primary-gradient);

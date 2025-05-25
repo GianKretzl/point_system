@@ -6,43 +6,6 @@ from db import db
 
 bp = Blueprint('main', __name__)
 
-# Função auxiliar: retorna lista de dias úteis do mês
-def get_workdays_in_month(year, month):
-    """Retorna uma lista de datas dos dias úteis do mês."""
-    from calendar import monthrange
-    num_days = monthrange(year, month)[1]
-    return [
-        datetime(year, month, day).date()
-        for day in range(1, num_days + 1)
-        if datetime(year, month, day).weekday() < 5  # 0=segunda, 4=sexta
-    ]
-
-# Função auxiliar: calcula faltas do funcionário no mês
-def get_employee_absences(user_id, year, month):
-    """Retorna o número de faltas do funcionário no mês."""
-    from calendar import monthrange
-    workdays = get_workdays_in_month(year, month)
-    records = TimeRecord.query.filter(
-        TimeRecord.user_id == user_id,
-        TimeRecord.date >= datetime(year, month, 1).date(),
-        TimeRecord.date <= datetime(year, month, monthrange(year, month)[1]).date()
-    ).with_entities(TimeRecord.date).all()
-    recorded_days = {r.date for r in records}
-    absences = [d for d in workdays if d not in recorded_days]
-    return len(absences)
-
-# Função auxiliar: calcula total de funcionários sem registro de ponto hoje
-def get_total_absences_today():
-    """Retorna o número de funcionários que não bateram ponto hoje (admin dashboard)."""
-    today = datetime.today().date()
-    employees = User.query.filter_by(is_employee=True).all()
-    total = 0
-    for emp in employees:
-        has_record = TimeRecord.query.filter_by(user_id=emp.id, date=today).first()
-        if not has_record:
-            total += 1
-    return total
-
 # Rota inicial: redireciona para login
 @bp.route('/')
 def home():
@@ -304,5 +267,41 @@ def reports():
         start_date=start_date,
         end_date=end_date
     )
+# Função auxiliar: retorna lista de dias úteis do mês
+def get_workdays_in_month(year, month):
+    """Retorna uma lista de datas dos dias úteis do mês."""
+    from calendar import monthrange
+    num_days = monthrange(year, month)[1]
+    return [
+        datetime(year, month, day).date()
+        for day in range(1, num_days + 1)
+        if datetime(year, month, day).weekday() < 5  # 0=segunda, 4=sexta
+    ]
+
+# Função auxiliar: calcula faltas do funcionário no mês
+def get_employee_absences(user_id, year, month):
+    """Retorna o número de faltas do funcionário no mês."""
+    from calendar import monthrange
+    workdays = get_workdays_in_month(year, month)
+    records = TimeRecord.query.filter(
+        TimeRecord.user_id == user_id,
+        TimeRecord.date >= datetime(year, month, 1).date(),
+        TimeRecord.date <= datetime(year, month, monthrange(year, month)[1]).date()
+    ).with_entities(TimeRecord.date).all()
+    recorded_days = {r.date for r in records}
+    absences = [d for d in workdays if d not in recorded_days]
+    return len(absences)
+
+# Função auxiliar: calcula total de funcionários sem registro de ponto hoje
+def get_total_absences_today():
+    """Retorna o número de funcionários que não bateram ponto hoje (admin dashboard)."""
+    today = datetime.today().date()
+    employees = User.query.filter_by(is_employee=True).all()
+    total = 0
+    for emp in employees:
+        has_record = TimeRecord.query.filter_by(user_id=emp.id, date=today).first()
+        if not has_record:
+            total += 1
+    return total
 
 
