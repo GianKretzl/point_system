@@ -1,11 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8" />
-    <title>Funcionario</title>
+    <title>Painel Funcionário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/employee.css') }}">
 </head>
 <body>
-   <h1>Painel Funcionário</h1>
-   <p>Bem-vindo ao painel de funcionário!</p>
+    <header>
+        <div class="menu-btn" id="menuicn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="logosec">
+            <div class="logo">Sistema Ponto</div>
+        </div>
+        <div class="user-menu" id="userMenu">
+            <span class="user-icon">👤</span>
+            <span class="user-name">{{ username }}</span>
+            <div class="user-dropdown" id="userDropdown">
+                <form method="POST" action="{{ url_for('main.logout') }}">
+                    <button type="submit" class="logout-btn">Sair</button>
+                </form>
+            </div>
+        </div>
+    </header>
+    <div class="main-container">
+        <div class="navcontainer">
+            <nav class="nav">
+                <div class="nav-upper-options">
+                    <a href="#" class="nav-option option1">
+                        <span>🕒</span>
+                        <span>Bater Ponto</span>
+                    </a>
+                    <a href="#" class="nav-option option2">
+                        <span>📝</span>
+                        <span>Justificativa</span>
+                    </a>
+                    <a href="#" class="nav-option option3">
+                        <span>📊</span>
+                        <span>Relatório</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <div class="main">
+            <h1>Painel Funcionário</h1>
+            <p>Bem-vindo ao painel de funcionário!</p>
+        </div>
+    </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const menuicn = document.getElementById("menuicn");
+        const nav = document.querySelector(".navcontainer");
+        if (menuicn && nav) {
+            menuicn.addEventListener("click", () => {
+                nav.classList.toggle("navclose");
+            });
+        }
+        // Mini menu usuário
+        const userMenu = document.getElementById("userMenu");
+        if (userMenu) {
+            userMenu.addEventListener("click", function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle("active");
+            });
+            document.addEventListener("click", function() {
+                userMenu.classList.remove("active");
+            });
+        }
+    });
+    </script>
 </body>
 </html>

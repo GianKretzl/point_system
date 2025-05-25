@@ -1,10 +1,44 @@
-<h2>Cadastrar Funcionário</h2>
-<form method="post">
-    <label for="nome">Nome:</label>
-    <input type="text" id="nome" name="nome" required>
-    <label for="username">Usuário:</label>
-    <input type="text" id="username" name="username" required>
-    <label for="senha">Senha:</label>
-    <input type="password" id="senha" name="senha" required>
-    <button type="submit">Cadastrar</button>
-</form>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Funcionário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register_employees.css') }}">
+</head>
+<body>
+    <div class="main">
+        <h2>Cadastrar Funcionário</h2>
+        <form method="POST" action="{{ url_for('main.register_employees') }}">
+            <div class="inputBx">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="inputBx">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="inputBx">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="inputBx">
+                <label for="is_admin">Administrador?</label>
+                <input type="checkbox" id="is_admin" name="is_admin" value="1">
+            </div>
+            <div class="button-row">
+                <button type="submit">Cadastrar</button>
+                <a href="{{ url_for('main.admin') }}">Voltar</a>
+            </div>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, message in messages %}
+                <li style="color: red;">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>
