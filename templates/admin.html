@@ -30,6 +30,14 @@
         <div class="navcontainer">
             <nav class="nav">
                 <div class="nav-upper-options">
+                    <a href="{{ url_for('main.clock') }}" class="nav-option option1">
+                        <span>🕒</span>
+                        <span>Registro de Ponto</span>
+                    </a>
+                    <a href="{{ url_for('main.justification') }}" class="nav-option option2">
+                        <span>📝</span>
+                        <span>Justificativa</span>
+                    </a>
                     <a href="{{ url_for('main.register_employees') }}" class="nav-option option1">
                         <span>👤</span>
                         <span>Cadastrar Funcionário</span>

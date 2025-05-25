@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
-from models import EmployeeSchedule, User
+from models import EmployeeSchedule, User, TimeRecord, Justification
 from forms import LoginForm
 from werkzeug.security import generate_password_hash
 from datetime import datetime
+from db import db
 
 bp = Blueprint('main', __name__)
 
@@ -63,7 +64,6 @@ def register_employees():
             is_admin=is_admin,
             is_employee=True
         )
-        from db import db
         db.session.add(user)
         db.session.commit()
         flash('Funcionário cadastrado com sucesso!', 'success')
@@ -91,7 +91,6 @@ def employee_schedule():
             entry_time=datetime.strptime(entry_time, '%H:%M').time(),
             exit_time=datetime.strptime(exit_time, '%H:%M').time()
         )
-        from db import db
         db.session.add(schedule)
         db.session.commit()
         flash('Horário cadastrado com sucesso!', 'success')
@@ -102,3 +101,48 @@ def employee_schedule():
 def logout():
     session.clear()
     return redirect(url_for('main.login'))
+
+@bp.route('/clock', methods=['GET', 'POST'])
+def clock():
+    if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
+        return redirect(url_for('main.login'))
+    user = User.query.filter_by(username=session.get('username')).first()
+    if request.method == 'POST':
+        punch_type = request.form.get('punch_type')
+        now = datetime.now()
+        record = TimeRecord.query.filter_by(user_id=user.id, date=now.date()).first()
+        if not record:
+            record = TimeRecord(user_id=user.id, date=now.date())
+            db.session.add(record)
+        if punch_type == 'entry':
+            record.entry_time = now.time()
+        elif punch_type == 'lunch_start':
+            record.lunch_start = now.time()
+        elif punch_type == 'lunch_end':
+            record.lunch_end = now.time()
+        elif punch_type == 'exit':
+            record.exit_time = now.time()
+        db.session.commit()
+        flash('Ponto registrado!', 'success')
+    return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'))
+
+@bp.route('/justification', methods=['GET', 'POST'])
+def justification():
+    if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
+        return redirect(url_for('main.login'))
+    user = User.query.filter_by(username=session.get('username')).first()
+    if request.method == 'POST':
+        date = request.form.get('date')
+        reason = request.form.get('reason')
+        if not date or not reason:
+            flash('Preencha todos os campos!', 'danger')
+        else:
+            justification = Justification(
+                user_id=user.id,
+                date=datetime.strptime(date, '%Y-%m-%d').date(),
+                reason=reason
+            )
+            db.session.add(justification)
+            db.session.commit()
+            flash('Justificativa enviada para análise!', 'success')
+    return render_template('employee_justification.html', username=user.username, is_admin=session.get('is_admin'))

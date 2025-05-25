@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Clock In/Out</title>
+</head>
+<body>
+    <h1>Clock In/Out</h1>
+    <form method="POST">
+        <button name="punch_type" value="entry" type="submit">Clock In</button>
+        <button name="punch_type" value="lunch_start" type="submit">Start Lunch</button>
+        <button name="punch_type" value="lunch_end" type="submit">End Lunch</button>
+        <button name="punch_type" value="exit" type="submit">Clock Out</button>
+    </form>
+    {% if is_admin %}
+        <a href="{{ url_for('main.admin') }}">Voltar</a>
+    {% else %}
+        <a href="{{ url_for('main.employee') }}">Voltar</a>
+    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>
