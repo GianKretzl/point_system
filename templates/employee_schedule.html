@@ -2,12 +2,12 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Horário Funcionário</title>
+    <title>Cadastrar Horário do Funcionário</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_schedule.css') }}">
 </head>
 <body>
     <div class="main">
-        <h2>Cadastrar Horário Funcionário</h2>
+        <h2>Cadastrar Horário do Funcionário</h2>
         <form method="POST" action="{{ url_for('main.employee_schedule') }}">
             <div class="inputBx">
                 <label for="user_id">Funcionário:</label>
@@ -19,12 +19,16 @@
                 </select>
             </div>
             <div class="inputBx">
-                <label for="date">Data:</label>
-                <input type="date" id="date" name="date" required>
-            </div>
-            <div class="inputBx">
                 <label for="entry_time">Entrada:</label>
                 <input type="time" id="entry_time" name="entry_time" required>
+            </div>
+            <div class="inputBx">
+                <label for="lunch_start">Início do Almoço:</label>
+                <input type="time" id="lunch_start" name="lunch_start" required>
+            </div>
+            <div class="inputBx">
+                <label for="lunch_end">Fim do Almoço:</label>
+                <input type="time" id="lunch_end" name="lunch_end" required>
             </div>
             <div class="inputBx">
                 <label for="exit_time">Saída:</label>
@@ -37,9 +41,9 @@
         </form>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            <ul>
+            <ul class="messages">
               {% for category, message in messages %}
-                <li style="color: red;">{{ message }}</li>
+                <li class="{{ category }}">{{ message }}</li>
               {% endfor %}
             </ul>
           {% endif %}

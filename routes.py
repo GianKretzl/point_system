@@ -77,18 +77,20 @@ def employee_schedule():
     users = User.query.all()
     if request.method == 'POST':
         user_id = request.form.get('user_id')
-        date = request.form.get('date')
         entry_time = request.form.get('entry_time')
+        lunch_start = request.form.get('lunch_start')
+        lunch_end = request.form.get('lunch_end')
         exit_time = request.form.get('exit_time')
 
-        if not user_id or not date or not entry_time or not exit_time:
+        if not user_id or not entry_time or not lunch_start or not lunch_end or not exit_time:
             flash('Preencha todos os campos!', 'danger')
             return render_template('employee_schedule.html', users=users)
 
         schedule = EmployeeSchedule(
             user_id=user_id,
-            date=datetime.strptime(date, '%Y-%m-%d').date(),
             entry_time=datetime.strptime(entry_time, '%H:%M').time(),
+            lunch_start=datetime.strptime(lunch_start, '%H:%M').time(),
+            lunch_end=datetime.strptime(lunch_end, '%H:%M').time(),
             exit_time=datetime.strptime(exit_time, '%H:%M').time()
         )
         db.session.add(schedule)

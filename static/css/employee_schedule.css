@@ -63,7 +63,9 @@ form {
 }
 
 .inputBx input[type="text"],
-.inputBx input[type="password"] {
+.inputBx input[type="password"],
+.inputBx input[type="time"],
+.inputBx select {
     background: var(--background-dark);
     color: var(--text);
     border: 1.5px solid var(--primary);
@@ -75,15 +77,10 @@ form {
 }
 
 .inputBx input[type="text"]:focus,
-.inputBx input[type="password"]:focus {
+.inputBx input[type="password"]:focus,
+.inputBx input[type="time"]:focus,
+.inputBx select:focus {
     border: 1.5px solid var(--accent);
-}
-
-.inputBx input[type="checkbox"] {
-    accent-color: var(--primary);
-    width: 18px;
-    height: 18px;
-    margin-top: 4px;
 }
 
 .button-row {
