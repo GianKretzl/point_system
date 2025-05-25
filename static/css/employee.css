@@ -209,10 +209,11 @@ header {
     outline: none;
 }
 
-.option1 {
-    background: linear-gradient(45deg, #ff357a, #fff172);
-    color: #222;
-    border: 2px solid var(--primary);
+.logo {
+    font-size: 2em;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 2px;
 }
 
 .main {
@@ -221,6 +222,23 @@ header {
     min-height: calc(100vh - 70px);
     background: transparent;
     overflow-y: auto;
+}
+
+.main h1 {
+    font-size: 2em;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+.main p {
+    font-size: 1.1em;
+    color: var(--text);
+}
+
+.option1 {
+    background: var(--primary-gradient);
+    color: #222;
+    border: 2px solid var(--primary);
 }
 
 /* Responsivo */

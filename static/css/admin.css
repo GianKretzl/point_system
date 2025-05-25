@@ -115,7 +115,7 @@ header {
 }
 
 .option1 {
-    background: linear-gradient(45deg, #ff357a, #fff172);
+    background: var(--primary-gradient);
     color: #222;
     border: 2px solid var(--primary);
 }
@@ -230,6 +230,18 @@ header {
 .logout-btn:hover {
     background: var(--primary-gradient);
     color: #222;
+}
+
+.main h1 {
+    font-size: 2em;
+    color: var(--primary);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.main p {
+    font-size: 1.1em;
+    color: var(--text);
 }
 
 /* Responsivo */
