@@ -244,6 +244,52 @@ header {
     color: var(--text);
 }
 
+.dashboard-cards {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    justify-content: center;
+}
+.card {
+    background: var(--box-bg);
+    border-radius: 18px;
+    box-shadow: var(--box-shadow);
+    padding: 24px 32px;
+    min-width: 180px;
+    text-align: center;
+    color: var(--text);
+}
+.card h3 {
+    color: var(--primary);
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+.card p {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0;
+}
+.dashboard-back-btn {
+    background: var(--primary-gradient);
+    color: #222;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 24px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 18px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px #0004;
+}
+.dashboard-back-btn:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
 /* Responsivo */
 @media (max-width: 900px) {
     .navcontainer {

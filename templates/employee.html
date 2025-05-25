@@ -37,16 +37,37 @@
                         <span>📝</span>
                         <span>Justificativa</span>
                     </a>
-                    <a href="#" class="nav-option option3">
+                    <a href="{{ url_for('main.reports') }}" class="nav-option option3">
                         <span>📊</span>
                         <span>Relatório</span>
                     </a>
                 </div>
             </nav>
         </div>
-        <div class="main">
-            <h1>Painel Funcionário</h1>
-            <p>Bem-vindo ao painel de funcionário!</p>
+        <div class="main" id="main-content">
+            <div id="dashboard-employee">
+                <h1>Painel Funcionário</h1>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Registros de Ponto no Mês</h3>
+                        <p>{{ records_this_month }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Faltas no Mês</h3>
+                        <p>{{ absences_this_month }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Justificativas Enviadas</h3>
+                        <p>{{ justifications_sent }}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Último Registro</h3>
+                        <p>{{ last_record }}</p>
+                    </div>
+                </div>
+                <p>Bem-vindo ao painel de funcionário!</p>
+            </div>
+            <div id="dynamic-content" style="display:none;"></div>
         </div>
     </div>
     <script>
@@ -68,6 +89,30 @@
             document.addEventListener("click", function() {
                 userMenu.classList.remove("active");
             });
+        }
+        // Função para carregar telas dinamicamente
+        function loadContent(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("dashboard-employee").style.display = "none";
+                    document.getElementById("dynamic-content").innerHTML = html;
+                    document.getElementById("dynamic-content").style.display = "block";
+                });
+        }
+        // Adiciona evento aos botões do menu lateral
+        document.querySelectorAll('.nav-upper-options a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                if (!link.href.endsWith('logout')) {
+                    e.preventDefault();
+                    loadContent(link.href);
+                }
+            });
+        });
+        // Botão voltar para dashboard
+        window.showDashboard = function() {
+            document.getElementById("dynamic-content").style.display = "none";
+            document.getElementById("dashboard-employee").style.display = "block";
         }
     });
     </script>

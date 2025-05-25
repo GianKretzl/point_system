@@ -4,6 +4,7 @@ from forms import LoginForm
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 from db import db
+from sqlalchemy import and_
 
 bp = Blueprint('main', __name__)
 
@@ -34,13 +35,40 @@ def login():
 def admin():
     if not session.get('username') or not session.get('is_admin'):
         return redirect(url_for('main.login'))
-    return render_template('admin.html', username=session.get('username'))
+    total_employees = User.query.filter_by(is_employee=True).count()
+    total_records_today = TimeRecord.query.filter(TimeRecord.date == datetime.today().date()).count()
+    total_justifications_pending = Justification.query.filter_by(status='pendente').count()
+    total_absences_today = ... # sua lógica de faltas
+    return render_template(
+        'admin.html',
+        username=session.get('username'),
+        total_employees=total_employees,
+        total_records_today=total_records_today,
+        total_justifications_pending=total_justifications_pending,
+        total_absences_today=total_absences_today
+    )
 
 @bp.route('/employee')
 def employee():
     if not session.get('username') or not session.get('is_employee'):
         return redirect(url_for('main.login'))
-    return render_template('employee.html', username=session.get('username'))
+    user = User.query.filter_by(username=session.get('username')).first()
+    records_this_month = TimeRecord.query.filter(
+        TimeRecord.user_id == user.id,
+        TimeRecord.date >= datetime.today().replace(day=1)
+    ).count()
+    absences_this_month = ... # sua lógica de faltas
+    justifications_sent = Justification.query.filter_by(user_id=user.id).count()
+    last_record = TimeRecord.query.filter_by(user_id=user.id).order_by(TimeRecord.date.desc()).first()
+    last_record_str = last_record.date.strftime('%d/%m/%Y') if last_record else '-'
+    return render_template(
+        'employee.html',
+        username=user.username,
+        records_this_month=records_this_month,
+        absences_this_month=absences_this_month,
+        justifications_sent=justifications_sent,
+        last_record=last_record_str
+    )
 
 @bp.route('/register_employees', methods=['GET', 'POST'])
 def register_employees():
@@ -148,3 +176,48 @@ def justification():
             db.session.commit()
             flash('Justificativa enviada para análise!', 'success')
     return render_template('employee_justification.html', username=user.username, is_admin=session.get('is_admin'))
+
+@bp.route('/reports', methods=['GET', 'POST'])
+def reports():
+    if not session.get('username'):
+        return redirect(url_for('main.login'))
+
+    is_admin = session.get('is_admin')
+    filters = {}
+    users = []
+    records = []
+
+    # Filtros do formulário
+    selected_user = request.form.get('user_id') if is_admin else None
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+
+    # Admin pode ver todos, funcionário só vê o próprio
+    if is_admin:
+        users = User.query.filter_by(is_employee=True).all()
+        query = TimeRecord.query
+        if selected_user:
+            query = query.filter(TimeRecord.user_id == selected_user)
+    else:
+        user = User.query.filter_by(username=session.get('username')).first()
+        query = TimeRecord.query.filter(TimeRecord.user_id == user.id)
+
+    # Filtro por datas
+    if start_date:
+        query = query.filter(TimeRecord.date >= start_date)
+    if end_date:
+        query = query.filter(TimeRecord.date <= end_date)
+
+    # Ordenação
+    query = query.order_by(TimeRecord.date.desc())
+    records = query.all()
+
+    return render_template(
+        'reports.html',
+        is_admin=is_admin,
+        users=users,
+        records=records,
+        selected_user=selected_user,
+        start_date=start_date,
+        end_date=end_date
+    )
