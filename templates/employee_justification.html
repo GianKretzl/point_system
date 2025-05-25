@@ -1,31 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8" />
-    <title>Justification</title>
+    <title>Justificativa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_justification.css') }}">
 </head>
 <body>
-    <h1>Absence/Delay Justification</h1>
-    <form method="POST">
-        <label for="date">Date:</label>
-        <input type="date" name="date" required><br>
-        <label for="reason">Reason:</label>
-        <textarea name="reason" required></textarea><br>
-        <button type="submit">Submit Justification</button>
-    </form>
-    {% if is_admin %}
-        <a href="{{ url_for('main.admin') }}">Voltar</a>
-    {% else %}
-        <a href="{{ url_for('main.employee') }}">Voltar</a>
-    {% endif %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <div class="main">
+        <h2>Justificativa de Ausência/Atraso</h2>
+        <form method="POST" class="justification-form">
+            <div class="inputBx">
+                <label for="date">Data:</label>
+                <input type="date" name="date" required>
+            </div>
+            <div class="inputBx">
+                <label for="reason">Motivo:</label>
+                <textarea name="reason" required></textarea>
+            </div>
+            <div class="button-row">
+                <button type="submit">Enviar Justificativa</button>
+                {% if is_admin %}
+                    <a href="{{ url_for('main.admin') }}">Voltar</a>
+                {% else %}
+                    <a href="{{ url_for('main.employee') }}">Voltar</a>
+                {% endif %}
+            </div>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="messages">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
 </body>
 </html>

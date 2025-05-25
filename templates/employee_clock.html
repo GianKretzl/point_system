@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8" />
-    <title>Clock In/Out</title>
+    <title>Registro de Ponto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_clock.css') }}">
 </head>
 <body>
-    <h1>Clock In/Out</h1>
-    <form method="POST">
-        <button name="punch_type" value="entry" type="submit">Clock In</button>
-        <button name="punch_type" value="lunch_start" type="submit">Start Lunch</button>
-        <button name="punch_type" value="lunch_end" type="submit">End Lunch</button>
-        <button name="punch_type" value="exit" type="submit">Clock Out</button>
-    </form>
-    {% if is_admin %}
-        <a href="{{ url_for('main.admin') }}">Voltar</a>
-    {% else %}
-        <a href="{{ url_for('main.employee') }}">Voltar</a>
-    {% endif %}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <div class="main">
+        <h2>Registro de Ponto</h2>
+        <form method="POST" class="clock-form">
+            <div class="button-row">
+                <button name="punch_type" value="entry" type="submit">Entrada</button>
+                <button name="punch_type" value="lunch_start" type="submit">Início Almoço</button>
+                <button name="punch_type" value="lunch_end" type="submit">Fim Almoço</button>
+                <button name="punch_type" value="exit" type="submit">Saída</button>
+            </div>
+        </form>
+        <div class="button-row">
+            {% if is_admin %}
+                <a href="{{ url_for('main.admin') }}">Voltar</a>
+            {% else %}
+                <a href="{{ url_for('main.employee') }}">Voltar</a>
+            {% endif %}
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="messages">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </div>
 </body>
 </html>
