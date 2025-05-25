@@ -1,24 +1,65 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from models import EmployeeSchedule, User, TimeRecord, Justification
 from forms import LoginForm
-from werkzeug.security import generate_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 from db import db
-from sqlalchemy import and_
 
 bp = Blueprint('main', __name__)
 
+# Função auxiliar: retorna lista de dias úteis do mês
+def get_workdays_in_month(year, month):
+    """Retorna uma lista de datas dos dias úteis do mês."""
+    from calendar import monthrange
+    num_days = monthrange(year, month)[1]
+    return [
+        datetime(year, month, day).date()
+        for day in range(1, num_days + 1)
+        if datetime(year, month, day).weekday() < 5  # 0=segunda, 4=sexta
+    ]
+
+# Função auxiliar: calcula faltas do funcionário no mês
+def get_employee_absences(user_id, year, month):
+    """Retorna o número de faltas do funcionário no mês."""
+    from calendar import monthrange
+    workdays = get_workdays_in_month(year, month)
+    records = TimeRecord.query.filter(
+        TimeRecord.user_id == user_id,
+        TimeRecord.date >= datetime(year, month, 1).date(),
+        TimeRecord.date <= datetime(year, month, monthrange(year, month)[1]).date()
+    ).with_entities(TimeRecord.date).all()
+    recorded_days = {r.date for r in records}
+    absences = [d for d in workdays if d not in recorded_days]
+    return len(absences)
+
+# Função auxiliar: calcula total de funcionários sem registro de ponto hoje
+def get_total_absences_today():
+    """Retorna o número de funcionários que não bateram ponto hoje (admin dashboard)."""
+    today = datetime.today().date()
+    employees = User.query.filter_by(is_employee=True).all()
+    total = 0
+    for emp in employees:
+        has_record = TimeRecord.query.filter_by(user_id=emp.id, date=today).first()
+        if not has_record:
+            total += 1
+    return total
+
+# Rota inicial: redireciona para login
 @bp.route('/')
 def home():
     return redirect(url_for('main.login'))
 
+# Rota de login
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Login de usuário. Salva informações na sessão.
+    Redireciona para painel admin ou funcionário conforme perfil.
+    """
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.password == form.password.data:  # Em produção, use hash!
-            session['username'] = user.username  # Salva o usuário na sessão
+            session['username'] = user.username
             session['is_admin'] = user.is_admin
             session['is_employee'] = user.is_employee
             if user.is_admin:
@@ -31,14 +72,18 @@ def login():
             flash('Usuário ou senha inválidos.', 'danger')
     return render_template('login.html', form=form)
 
+# Painel do administrador
 @bp.route('/admin')
 def admin():
+    """
+    Painel do admin: mostra dashboard com totais de funcionários, registros, justificativas e faltas do dia.
+    """
     if not session.get('username') or not session.get('is_admin'):
         return redirect(url_for('main.login'))
     total_employees = User.query.filter_by(is_employee=True).count()
     total_records_today = TimeRecord.query.filter(TimeRecord.date == datetime.today().date()).count()
-    total_justifications_pending = Justification.query.filter_by(status='pendente').count()
-    total_absences_today = ... # sua lógica de faltas
+    total_justifications_pending = Justification.query.filter_by(status='pendente').count() if hasattr(Justification, 'status') else 0
+    total_absences_today = get_total_absences_today()
     return render_template(
         'admin.html',
         username=session.get('username'),
@@ -48,16 +93,22 @@ def admin():
         total_absences_today=total_absences_today
     )
 
+# Painel do funcionário
 @bp.route('/employee')
 def employee():
+    """
+    Painel do funcionário: mostra dashboard com registros do mês, faltas, justificativas e último registro.
+    """
     if not session.get('username') or not session.get('is_employee'):
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
+    today = datetime.today()
     records_this_month = TimeRecord.query.filter(
         TimeRecord.user_id == user.id,
-        TimeRecord.date >= datetime.today().replace(day=1)
+        TimeRecord.date >= today.replace(day=1).date(),
+        TimeRecord.date <= today.date()
     ).count()
-    absences_this_month = ... # sua lógica de faltas
+    absences_this_month = get_employee_absences(user.id, today.year, today.month)
     justifications_sent = Justification.query.filter_by(user_id=user.id).count()
     last_record = TimeRecord.query.filter_by(user_id=user.id).order_by(TimeRecord.date.desc()).first()
     last_record_str = last_record.date.strftime('%d/%m/%Y') if last_record else '-'
@@ -70,8 +121,12 @@ def employee():
         last_record=last_record_str
     )
 
+# Cadastro de funcionários (admin)
 @bp.route('/register_employees', methods=['GET', 'POST'])
 def register_employees():
+    """
+    Permite ao admin cadastrar novos funcionários.
+    """
     if not session.get('username') or not session.get('is_admin'):
         return redirect(url_for('main.login'))
     if request.method == 'POST':
@@ -80,7 +135,6 @@ def register_employees():
         password = request.form.get('password')
         is_admin = True if request.form.get('is_admin') == '1' else False
 
-        # Verifica se usuário já existe
         if User.query.filter_by(username=username).first():
             flash('Usuário já existe!', 'danger')
             return render_template('register_employees.html')
@@ -88,7 +142,7 @@ def register_employees():
         user = User(
             name=name,
             username=username,
-            password=password,  
+            password=password,  # Em produção, use hash!
             is_admin=is_admin,
             is_employee=True
         )
@@ -98,8 +152,12 @@ def register_employees():
         return redirect(url_for('main.register_employees'))
     return render_template('register_employees.html')
 
+# Cadastro de horários padrão dos funcionários (admin)
 @bp.route('/employee_schedule', methods=['GET', 'POST'])
 def employee_schedule():
+    """
+    Permite ao admin cadastrar o horário padrão de cada funcionário.
+    """
     if not session.get('username') or not session.get('is_admin'):
         return redirect(url_for('main.login'))
     users = User.query.all()
@@ -127,13 +185,21 @@ def employee_schedule():
         return redirect(url_for('main.employee_schedule'))
     return render_template('employee_schedule.html', users=users)
 
+# Logout (encerra sessão)
 @bp.route('/logout', methods=['POST'])
 def logout():
+    """
+    Encerra a sessão do usuário.
+    """
     session.clear()
     return redirect(url_for('main.login'))
 
+# Registro de ponto (funcionário/admin)
 @bp.route('/clock', methods=['GET', 'POST'])
 def clock():
+    """
+    Permite ao funcionário/admin registrar batidas de ponto (entrada, almoço, saída).
+    """
     if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
@@ -154,10 +220,16 @@ def clock():
             record.exit_time = now.time()
         db.session.commit()
         flash('Ponto registrado!', 'success')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template('employee_clock_partial.html', username=user.username, is_admin=session.get('is_admin'))
     return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'))
 
+# Justificativa de ausência/atraso (funcionário/admin)
 @bp.route('/justification', methods=['GET', 'POST'])
 def justification():
+    """
+    Permite ao funcionário enviar justificativas de ausência/atraso.
+    """
     if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
@@ -175,24 +247,27 @@ def justification():
             db.session.add(justification)
             db.session.commit()
             flash('Justificativa enviada para análise!', 'success')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template('employee_justification_partial.html', username=user.username, is_admin=session.get('is_admin'))
     return render_template('employee_justification.html', username=user.username, is_admin=session.get('is_admin'))
 
+# Relatórios (admin vê todos, funcionário vê só os próprios)
 @bp.route('/reports', methods=['GET', 'POST'])
 def reports():
+    """
+    Relatórios de ponto: admin pode filtrar por funcionário e datas, funcionário vê só seus registros.
+    """
     if not session.get('username'):
         return redirect(url_for('main.login'))
 
     is_admin = session.get('is_admin')
-    filters = {}
     users = []
     records = []
 
-    # Filtros do formulário
     selected_user = request.form.get('user_id') if is_admin else None
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
 
-    # Admin pode ver todos, funcionário só vê o próprio
     if is_admin:
         users = User.query.filter_by(is_employee=True).all()
         query = TimeRecord.query
@@ -202,16 +277,24 @@ def reports():
         user = User.query.filter_by(username=session.get('username')).first()
         query = TimeRecord.query.filter(TimeRecord.user_id == user.id)
 
-    # Filtro por datas
     if start_date:
         query = query.filter(TimeRecord.date >= start_date)
     if end_date:
         query = query.filter(TimeRecord.date <= end_date)
 
-    # Ordenação
     query = query.order_by(TimeRecord.date.desc())
     records = query.all()
 
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template(
+            'reports_partial.html',
+            is_admin=is_admin,
+            users=users,
+            records=records,
+            selected_user=selected_user,
+            start_date=start_date,
+            end_date=end_date
+        )
     return render_template(
         'reports.html',
         is_admin=is_admin,
@@ -221,3 +304,5 @@ def reports():
         start_date=start_date,
         end_date=end_date
     )
+
+

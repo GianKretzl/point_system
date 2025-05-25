@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Painel Admin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    </head>
+</head>
 <body>
     <header>
         <div class="menu-btn" id="menuicn">
@@ -54,60 +54,50 @@
             </nav>
         </div>
         <div class="main" id="main-content">
-            <div id="dashboard-admin">
-                <h1>Painel Administrador</h1>
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <h3>Total de Funcionários</h3>
-                        <p>{{ total_employees }}</p>
-                    </div>
-                    <div class="card">
-                        <h3>Registros de Ponto Hoje</h3>
-                        <p>{{ total_records_today }}</p>
-                    </div>
-                    <div class="card">
-                        <h3>Justificativas Pendentes</h3>
-                        <p>{{ total_justifications_pending }}</p>
-                    </div>
-                    <div class="card">
-                        <h3>Faltas Hoje</h3>
-                        <p>{{ total_absences_today }}</p>
-                    </div>
+            <h1>Painel Administrador</h1>
+            <p>Bem-vindo ao painel de administrador!</p>
+            <div class="dashboard-cards">
+                <div class="card">
+                    <h3>Total de Funcionários</h3>
+                    <p>{{ total_employees }}</p>
                 </div>
-                <p>Bem-vindo ao painel de administrador!</p>
-            </div>
-            <div id="dynamic-content" style="display:none;"></div>
+                <div class="card">
+                    <h3>Registros de Ponto Hoje</h3>
+                    <p>{{ total_records_today }}</p>
+                </div>
+                <div class="card">
+                    <h3>Justificativas Pendentes</h3>
+                    <p>{{ total_justifications_pending }}</p>
+                </div>
+                <div class="card">
+                    <h3>Faltas Hoje</h3>
+                    <p>{{ total_absences_today }}</p>
+                </div>
+            </div>            
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
     <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Função para carregar telas dinamicamente
-    function loadContent(url) {
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById("dashboard-admin").style.display = "none";
-                document.getElementById("dynamic-content").innerHTML = html;
-                document.getElementById("dynamic-content").style.display = "block";
+    document.addEventListener("DOMContentLoaded", function() {
+        // Menu sanduíche
+        const menuicn = document.getElementById("menuicn");
+        const nav = document.querySelector(".navcontainer");
+        if (menuicn && nav) {
+            menuicn.addEventListener("click", () => {
+                nav.classList.toggle("navclose");
             });
-    }
-    // Adiciona evento aos botões do menu lateral
-    document.querySelectorAll('.nav-upper-options a').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            // Só faz AJAX para rotas internas (não logout)
-            if (!link.href.endsWith('logout')) {
-                e.preventDefault();
-                loadContent(link.href);
-            }
-        });
+        }
+        // Mini menu usuário
+        const userMenu = document.getElementById("userMenu");
+        if (userMenu) {
+            userMenu.addEventListener("click", function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle("active");
+            });
+            document.addEventListener("click", function() {
+                userMenu.classList.remove("active");
+            });
+        }
     });
-    // Botão voltar para dashboard
-    window.showDashboard = function() {
-        document.getElementById("dynamic-content").style.display = "none";
-        document.getElementById("dashboard-admin").style.display = "block";
-    }
-});
-</script>
+    </script>
 </body>
 </html>

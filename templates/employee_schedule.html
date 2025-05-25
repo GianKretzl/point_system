@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_schedule.css') }}">
 </head>
 <body>
-    <!-- Adicione logo após a tag <body> ou antes do conteúdo principal -->
-    <button type="button" onclick="showDashboard()" class="dashboard-back-btn">← Voltar ao Dashboard</button>
     <div class="main">
         <h2>Cadastrar Horário do Funcionário</h2>
         <form method="POST" action="{{ url_for('main.employee_schedule') }}">
