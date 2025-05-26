@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, send_file
 from models import EmployeeSchedule, User, TimeRecord, Justification
 from forms import LoginForm
 from datetime import datetime, timedelta
 from db import db
+import io
+import xlwt
 
 bp = Blueprint('main', __name__)
 
@@ -299,6 +301,74 @@ def reports():
         start_date=start_date,
         end_date=end_date
     )
+
+@bp.route('/download_report')
+def download_report():
+    """
+    Gera e baixa o relatório de ponto em formato .xls conforme filtros.
+    """
+    if not session.get('username'):
+        return redirect(url_for('main.login'))
+
+    is_admin = session.get('is_admin')
+    user_id = request.args.get('user_id') if is_admin else None
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    if is_admin:
+        query = TimeRecord.query
+        if user_id:
+            query = query.filter(TimeRecord.user_id == user_id)
+    else:
+        user = User.query.filter_by(username=session.get('username')).first()
+        query = TimeRecord.query.filter(TimeRecord.user_id == user.id)
+
+    if start_date:
+        query = query.filter(TimeRecord.date >= start_date)
+    if end_date:
+        query = query.filter(TimeRecord.date <= end_date)
+
+    query = query.order_by(TimeRecord.date.desc())
+    records = query.all()
+
+    # Cria planilha XLS
+    output = io.BytesIO()
+    wb = xlwt.Workbook()
+    ws = wb.add_sheet('Relatório de Ponto')
+
+    row_num = 0
+    columns = []
+    if is_admin:
+        columns.append('Funcionário')
+    columns += ['Data', 'Entrada', 'Início Almoço', 'Fim Almoço', 'Saída']
+
+    # Cabeçalho
+    for col_num, column_title in enumerate(columns):
+        ws.write(row_num, col_num, column_title)
+
+    # Dados
+    for record in records:
+        row_num += 1
+        col = 0
+        if is_admin:
+            ws.write(row_num, col, record.user.name)
+            col += 1
+        ws.write(row_num, col, record.date.strftime('%d/%m/%Y'))
+        ws.write(row_num, col+1, record.entry_time.strftime('%H:%M') if record.entry_time else '-')
+        ws.write(row_num, col+2, record.lunch_start.strftime('%H:%M') if record.lunch_start else '-')
+        ws.write(row_num, col+3, record.lunch_end.strftime('%H:%M') if record.lunch_end else '-')
+        ws.write(row_num, col+4, record.exit_time.strftime('%H:%M') if record.exit_time else '-')
+
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(
+        output,
+        mimetype="application/vnd.ms-excel",
+        as_attachment=True,
+        download_name="relatorio_ponto.xls"
+    )
+
 # Função auxiliar: retorna lista de dias úteis do mês
 def get_workdays_in_month(year, month):
     """Retorna uma lista de datas dos dias úteis do mês."""
