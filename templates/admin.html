@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Painel Admin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -16,11 +17,16 @@
             <div class="logo">Sistema Ponto</div>
         </div>
         <div class="user-menu" id="userMenu">
-            <span class="user-icon">👤</span>
+            <span class="user-icon"><i class="fa-solid fa-user"></i></span>
             <span class="user-name">{{ username }}</span>
             <div class="user-dropdown" id="userDropdown">
+                <a href="{{ url_for('main.account') }}" class="account-btn">
+                    <i class="fa-solid fa-user-gear"></i> Minha Conta
+                </a>
                 <form method="POST" action="{{ url_for('main.logout') }}">
-                    <button type="submit" class="logout-btn">Sair</button>
+                    <button type="submit" class="logout-btn">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    </button>
                 </form>
             </div>
         </div>
@@ -31,23 +37,23 @@
             <nav class="nav">
                 <div class="nav-upper-options">
                     <a href="{{ url_for('main.clock') }}" class="nav-option option1">
-                        <span>🕒</span>
+                        <i class="fa-solid fa-clock"></i>
                         <span>Registro de Ponto</span>
                     </a>
                     <a href="{{ url_for('main.justification') }}" class="nav-option option2">
-                        <span>📝</span>
+                        <i class="fa-solid fa-file-signature"></i>
                         <span>Justificativa</span>
                     </a>
                     <a href="{{ url_for('main.register_employees') }}" class="nav-option option1">
-                        <span>👤</span>
+                        <i class="fa-solid fa-user-plus"></i>
                         <span>Cadastrar Funcionário</span>
                     </a>
                     <a href="{{ url_for('main.employee_schedule') }}" class="nav-option option2">
-                        <span>🕒</span>
+                        <i class="fa-solid fa-calendar-check"></i>
                         <span>Cadastrar Horário Funcionário</span>
                     </a>
                     <a href="{{ url_for('main.reports') }}" class="nav-option option3">
-                        <span>📊</span>
+                        <i class="fa-solid fa-chart-line"></i>
                         <span>Relatórios</span>
                     </a>
                 </div>

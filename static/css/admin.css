@@ -101,8 +101,10 @@ header {
     cursor: pointer;
 }
 
-.nav-option span:first-child {
-    font-size: 1.5em;
+.nav-option i {
+    font-size: 1.3em;
+    margin-right: 10px;
+    transition: color 0.2s, transform 0.2s;
 }
 
 .nav-option:hover,
@@ -112,6 +114,11 @@ header {
     border: 2px solid var(--primary);
     box-shadow: 0 0 16px var(--accent), 0 2px 8px #0004;
     outline: none;
+}
+
+.nav-option:hover i {
+    color: var(--primary, #0078ff);
+    transform: scale(1.15) rotate(-5deg);
 }
 
 .option1 {
@@ -190,6 +197,12 @@ header {
     color: #222;
 }
 
+.user-icon i {
+    font-size: 1.3em;
+    color: #222;
+    background: none;
+}
+
 .user-name {
     color: var(--text);
     font-size: 1em;
@@ -214,6 +227,23 @@ header {
     display: block;
 }
 
+.user-dropdown a.account-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    font-size: 1em;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown a.account-btn:hover {
+    background: var(--primary-gradient);
+    color: #222;
+}
+
 .logout-btn {
     width: 100%;
     background: none;
@@ -230,6 +260,10 @@ header {
 .logout-btn:hover {
     background: var(--primary-gradient);
     color: #222;
+}
+
+.logout-btn i {
+    margin-right: 6px;
 }
 
 .main h1 {

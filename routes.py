@@ -304,4 +304,24 @@ def get_total_absences_today():
             total += 1
     return total
 
+@bp.route('/account', methods=['GET', 'POST'])
+def account():
+    """
+    Permite ao usuário editar suas informações (nome, senha).
+    """
+    if not session.get('username'):
+        return redirect(url_for('main.login'))
+    user = User.query.filter_by(username=session.get('username')).first()
+    if request.method == 'POST':
+        name = request.form.get('name')
+        password = request.form.get('password')
+        if name:
+            user.name = name
+        if password:
+            user.password = password  # Em produção, use hash!
+        db.session.commit()
+        flash('Dados atualizados com sucesso!', 'success')
+        return redirect(url_for('main.account'))
+    return render_template('account.html', user=user)
+
 

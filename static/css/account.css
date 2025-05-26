@@ -19,6 +19,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Quicksand", sans-serif;
 }
 
 .main {
@@ -97,6 +98,32 @@ form {
     font-size: 1.1em;
 }
 
+.password-visualize {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    margin-left: 2px;
+    font-size: 0.98em;
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.password-eye-btn {
+    position: absolute;
+    right: 12px;
+    top: 38px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    font-size: 1.15em;
+}
+
 .button-row {
     display: flex;
     justify-content: space-between;
@@ -130,76 +157,6 @@ form {
     background: var(--accent);
     color: #fff;
     transform: translateY(-2px) scale(1.03);
-}
-
-/* Switch de administrador */
-.admin-switch {
-    flex-direction: row;
-    align-items: center;
-    gap: 14px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
-
-.switch-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-    font-weight: 600;
-    font-size: 1.08em;
-}
-
-.switch-label input[type="checkbox"] {
-    display: none;
-}
-
-.slider {
-    width: 40px;
-    height: 22px;
-    background: #c0392b; /* vermelho padrão */
-    border-radius: 14px;
-    position: relative;
-    transition: background 0.2s;
-    margin-left: 8px;
-    box-shadow: 0 1px 4px #0002;
-    display: inline-block;
-}
-
-.slider:before {
-    content: "";
-    position: absolute;
-    left: 3px;
-    top: 3px;
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s;
-}
-
-.switch-label input:checked + .slider {
-    background: #27ae60; /* verde quando ativo */
-}
-
-.switch-label input:checked + .slider:before {
-    transform: translateX(18px);
-}
-
-.admin-desc {
-    font-size: 0.97em;
-    color: #bbb;
-    margin-left: 6px;
-    min-width: 110px;
-    text-align: left;
-    transition: color 0.2s;
-    font-weight: 500;
-}
-
-.admin-desc.active {
-    color: #27ae60;
-    font-weight: 600;
 }
 
 ul {

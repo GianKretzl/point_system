@@ -93,6 +93,12 @@ header {
     color: #222;
 }
 
+.user-icon i {
+    font-size: 1.3em;
+    color: #222;
+    background: none;
+}
+
 .user-name {
     color: var(--text);
     font-size: 1em;
@@ -117,6 +123,23 @@ header {
     display: block;
 }
 
+.user-dropdown a.account-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    font-size: 1em;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown a.account-btn:hover {
+    background: var(--primary-gradient);
+    color: #222;
+}
+
 .logout-btn {
     width: 100%;
     background: none;
@@ -133,6 +156,10 @@ header {
 .logout-btn:hover {
     background: var(--primary-gradient);
     color: #222;
+}
+
+.logout-btn i {
+    margin-right: 6px;
 }
 
 .main-container {
