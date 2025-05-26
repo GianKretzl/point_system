@@ -45,8 +45,11 @@
             </nav>
         </div>
         <div class="main" id="main-content">
-            <h1>Painel Funcionário</h1>
-            <p>Bem-vindo ao painel de funcionário!</p>
+            <div class="dashboard-header">
+                <h1>Painel Funcionário</h1>
+                <p>Bem-vindo ao painel de funcionário!</p>
+                <div class="dashboard-clock" id="dashboard-clock">--:--:--</div>
+            </div>
             <div class="dashboard-cards">
                 <div class="card">
                     <h3>Registros de Ponto no Mês</h3>
@@ -68,8 +71,8 @@
         </div>
     </div>
     <script>
+    // Menu sanduíche e menu usuário
     document.addEventListener("DOMContentLoaded", function() {
-        // Menu sanduíche
         const menuicn = document.getElementById("menuicn");
         const nav = document.querySelector(".navcontainer");
         if (menuicn && nav) {
@@ -77,7 +80,6 @@
                 nav.classList.toggle("navclose");
             });
         }
-        // Mini menu usuário
         const userMenu = document.getElementById("userMenu");
         if (userMenu) {
             userMenu.addEventListener("click", function(e) {
@@ -88,6 +90,27 @@
                 userMenu.classList.remove("active");
             });
         }
+
+        // Relógio digital no painel
+        function updateDashboardClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('dashboard-clock').textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateDashboardClock, 1000);
+        updateDashboardClock();
+
+        // Animação nos cards ao passar o mouse
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('card-hover');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('card-hover');
+            });
+        });
     });
     </script>
 </body>

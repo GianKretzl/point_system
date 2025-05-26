@@ -235,19 +235,20 @@ header {
 .main h1 {
     font-size: 2em;
     color: var(--primary);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     font-weight: 600;
 }
 
 .main p {
     font-size: 1.1em;
     color: var(--text);
+    margin-bottom: 15px;
 }
 
 .main h1,
 .main > p {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .dashboard-cards {
@@ -265,6 +266,7 @@ header {
     min-width: 180px;
     text-align: center;
     color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s;
 }
 .card h3 {
     color: var(--primary);
@@ -294,6 +296,29 @@ header {
 .dashboard-back-btn:hover {
     background: var(--accent);
     color: #fff;
+}
+
+.dashboard-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.dashboard-clock {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 6px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.card-hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 2px 8px #0004;
+    border: 2px solid var(--primary);
 }
 
 /* Responsivo */
