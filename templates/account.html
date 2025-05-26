@@ -18,12 +18,14 @@
                 <label for="username"><i class="fa-solid fa-id-badge"></i> Usuário:</label>
                 <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
             </div>
-            <div class="inputBx" style="position: relative;">
+            <div class="inputBx">
                 <label for="password"><i class="fa-solid fa-lock"></i> Nova Senha:</label>
-                <input type="password" id="password" name="password" value="{{ user.password }}" placeholder="Deixe em branco para não alterar" style="padding-right: 44px;">
-                <button type="button" class="password-eye-btn" onclick="togglePassword()" tabindex="-1" style="position: absolute; right: 12px; top: 38px; background: none; border: none; cursor: pointer; color: var(--primary);">
-                    <i id="eye-icon" class="fa-regular fa-eye"></i>
-                </button>
+                <div class="password-input-wrapper">
+                    <input type="password" id="password" name="password" value="{{ user.password }}" placeholder="Deixe em branco para não alterar">
+                    <button type="button" class="password-eye-btn" onclick="togglePassword()" tabindex="-1">
+                        <i id="eye-icon" class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="button-row">
                 <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
