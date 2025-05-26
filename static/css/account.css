@@ -120,13 +120,13 @@ form {
 .password-input-wrapper input[type="password"] {
     width: 100%;
     border-radius: 18px;
-    padding-right: 40px; /* espaço para o olho */
+    padding-right: 36px; /* espaço para o botão do olho */
     border: 1.5px solid var(--primary);
 }
 
 .password-eye-btn {
     position: absolute;
-    right: 14px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -137,7 +137,6 @@ form {
     display: flex;
     align-items: center;
     font-size: 1.15em;
-    z-index: 2;
     height: 24px;
 }
 
@@ -179,6 +178,21 @@ form {
 ul {
     margin-top: 18px;
     padding-left: 18px;
+}
+
+.password-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    margin-left: 2px;
+}
+
+.password-toggle span {
+    margin: 0;
+    font-size: 0.98em;
+    color: var(--text-muted);
+    user-select: none;
 }
 
 @media (max-width: 500px) {
