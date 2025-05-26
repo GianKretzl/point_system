@@ -74,9 +74,10 @@ header {
 .nav-upper-options {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px; 
     width: 100%;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .nav-option {

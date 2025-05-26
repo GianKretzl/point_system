@@ -219,6 +219,33 @@ def justification():
         return render_template('employee_justification_partial.html', username=user.username, is_admin=session.get('is_admin'))
     return render_template('employee_justification.html', username=user.username, is_admin=session.get('is_admin'))
 
+# Justificativas pendentes (admin)
+@bp.route('/justifications_admin', methods=['GET', 'POST'])
+def justifications_admin():
+    """
+    Permite ao admin visualizar e abonar (aprovar/rejeitar) justificativas pendentes.
+    """
+    if not session.get('username') or not session.get('is_admin'):
+        return redirect(url_for('main.login'))
+
+    if request.method == 'POST':
+        justification_id = request.form.get('justification_id')
+        action = request.form.get('action')
+        justification = Justification.query.get(justification_id)
+        if justification and justification.status == 'pending':
+            if action == 'approve':
+                justification.status = 'approved'
+            elif action == 'reject':
+                justification.status = 'rejected'
+            justification.reviewed_at = datetime.utcnow()
+            db.session.commit()
+            flash('Justificativa atualizada!', 'success')
+        else:
+            flash('Justificativa não encontrada ou já processada.', 'danger')
+
+    justifications = Justification.query.filter_by(status='pending').all()
+    return render_template('justifications_admin.html', justifications=justifications)
+
 # Relatórios (admin vê todos, funcionário vê só os próprios)
 @bp.route('/reports', methods=['GET', 'POST'])
 def reports():
