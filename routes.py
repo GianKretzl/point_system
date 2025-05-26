@@ -166,10 +166,10 @@ def clock():
     if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
+    now = datetime.now()
+    record = TimeRecord.query.filter_by(user_id=user.id, date=now.date()).first()
     if request.method == 'POST':
         punch_type = request.form.get('punch_type')
-        now = datetime.now()
-        record = TimeRecord.query.filter_by(user_id=user.id, date=now.date()).first()
         if not record:
             record = TimeRecord(user_id=user.id, date=now.date())
             db.session.add(record)
@@ -185,7 +185,12 @@ def clock():
         flash('Ponto registrado!', 'success')
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render_template('employee_clock_partial.html', username=user.username, is_admin=session.get('is_admin'))
-    return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'))
+    return render_template(
+        'employee_clock.html',
+        username=user.username,
+        is_admin=session.get('is_admin'),
+        record=record  # <-- Adicione esta linha
+    )
 
 # Justificativa de ausência/atraso (funcionário/admin)
 @bp.route('/justification', methods=['GET', 'POST'])

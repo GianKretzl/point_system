@@ -130,6 +130,32 @@ body {
     color: #fff;
 }
 
+.mini-report {
+    margin-top: 24px;
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.mini-report h3 {
+    font-size: 1.1em;
+    color: var(--primary);
+    margin-bottom: 10px;
+    text-align: center;
+}
+.mini-report ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.mini-report li {
+    font-size: 1em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-align: center;
+}
+
 @media (max-width: 500px) {
     .main {
         padding: 18px 6px 12px 6px;
