@@ -15,7 +15,7 @@
             </div>
             <div class="inputBx">
                 <label for="reason">Motivo:</label>
-                <textarea name="reason" required></textarea>
+                <textarea name="reason" required placeholder="Descreva o motivo da ausência ou atraso..."></textarea>
             </div>
             <div class="button-row">
                 <button type="submit">Enviar Justificativa</button>
@@ -36,5 +36,16 @@
           {% endif %}
         {% endwith %}
     </div>
+    <script>
+        // Animação de foco nos campos
+        document.querySelectorAll('.inputBx input, .inputBx textarea').forEach(el => {
+            el.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-focus');
+            });
+            el.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-focus');
+            });
+        });
+    </script>
 </body>
 </html>
