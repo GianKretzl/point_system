@@ -21,8 +21,8 @@ class EmployeeSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # FK para User
     entry_time = db.Column(db.Time, nullable=False)  # Horário de entrada padrão
-    lunch_start = db.Column(db.Time, nullable=False)  # Início do almoço
-    lunch_end = db.Column(db.Time, nullable=False)    # Fim do almoço
+    lunch_start = db.Column(db.Time, nullable=True)  # Início do almoço (agora pode ser nulo)
+    lunch_end = db.Column(db.Time, nullable=True)    # Fim do almoço (agora pode ser nulo)
     exit_time = db.Column(db.Time, nullable=False)    # Saída
 
     user = db.relationship('User', backref='schedule')

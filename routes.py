@@ -133,15 +133,16 @@ def employee_schedule():
         lunch_end = request.form.get('lunch_end')
         exit_time = request.form.get('exit_time')
 
-        if not user_id or not entry_time or not lunch_start or not lunch_end or not exit_time:
-            flash('Preencha todos os campos!', 'danger')
+        # Agora só exige user_id, entry_time e exit_time
+        if not user_id or not entry_time or not exit_time:
+            flash('Preencha os campos obrigatórios: Funcionário, Entrada e Saída!', 'danger')
             return render_template('employee_schedule.html', users=users)
 
         schedule = EmployeeSchedule(
             user_id=user_id,
             entry_time=datetime.strptime(entry_time, '%H:%M').time(),
-            lunch_start=datetime.strptime(lunch_start, '%H:%M').time(),
-            lunch_end=datetime.strptime(lunch_end, '%H:%M').time(),
+            lunch_start=datetime.strptime(lunch_start, '%H:%M').time() if lunch_start else None,
+            lunch_end=datetime.strptime(lunch_end, '%H:%M').time() if lunch_end else None,
             exit_time=datetime.strptime(exit_time, '%H:%M').time()
         )
         db.session.add(schedule)
