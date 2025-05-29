@@ -31,11 +31,21 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
-                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                  <div class="alert alert-{{ category }}">
+                    <button class="close-btn" onclick="this.parentElement.style.display='none';" aria-label="Fechar">&times;</button>
+                    {{ message }}
+                  </div>
                 {% endfor %}
               {% endif %}
             {% endwith %}
         </div>
     </div>
+    <script>
+      setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+          alert.style.display = 'none';
+        });
+      }, 3500); 
+    </script>
 </body>
 </html>

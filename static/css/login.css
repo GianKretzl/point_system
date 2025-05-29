@@ -126,3 +126,42 @@ p{
   text-align: center;
   text-decoration: none;
 }
+.alert {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    z-index: 9999;
+    min-width: 260px;
+    max-width: 350px;
+    background: #ff9900;
+    color: #222;
+    border-radius: 12px;
+    padding: 16px 40px 16px 18px;
+    margin-top: 0;
+    font-weight: 600;
+    text-align: left;
+    box-shadow: 0 0 18px #ff9900cc;
+    border: none;
+    display: flex;
+    align-items: center;
+    animation: fadeInUp 0.5s;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+.alert .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #222;
+    font-size: 1.2em;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0;
+}
