@@ -92,44 +92,41 @@ form {
 
 .button-row {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 18px;
 }
 
 .button-row button,
 .button-row a {
-    flex: 1;
-    background: var(--primary-gradient);
-    color: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 28px;
     border: none;
     border-radius: 18px;
-    padding: 12px 0;
-    font-size: 1.1em;
+    font-size: 1.08em;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 10px;
-    text-align: center;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-    box-shadow: 0 2px 8px #0004;
+    background: linear-gradient(45deg, #ff357a, #fff172);
+    color: #222;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18), 0 4px 24px rgba(0,0,0,0.10); /* sombra extra */
+    transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
-.button-row button:hover,
+.button-row button:focus,
+.button-row a:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #ff357a55, 0 2px 12px rgba(0,0,0,0.18); /* leve destaque rosa + sombra */
+}
+
+.button-row a,
+.button-row a:visited,
+.button-row a:active,
+.button-row a:focus,
 .button-row a:hover {
-    background: var(--accent);
-    color: #fff;
-}
-
-.button-row button i,
-.button-row a i {
-    margin-right: 8px;
-    font-size: 1.08em;
-    vertical-align: middle;
-}
-
-.button-row button:hover i,
-.button-row a:hover i {
-    color: #fff;
+    text-decoration: none;
 }
 
 /* Switch customizado para incluir horário de almoço */

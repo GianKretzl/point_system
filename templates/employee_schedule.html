@@ -8,10 +8,10 @@
 </head>
 <body>
     <div class="main">
-        <h2><i class="fa-solid fa-clock"></i> Cadastrar Horário do Funcionário</h2>
+        <h2>Cadastrar Horário do Funcionário</h2>
         <form method="POST" action="{{ url_for('main.employee_schedule') }}">
             <div class="inputBx">
-                <label for="user_id"><i class="fa-solid fa-user"></i> Funcionário:</label>
+                <label for="user_id">Funcionário:</label>
                 <select id="user_id" name="user_id" required>
                     <option value="">Selecione</option>
                     {% for user in users %}
@@ -20,13 +20,13 @@
                 </select>
             </div>
             <div class="inputBx">
-                <label for="entry_time"><i class="fa-solid fa-door-open"></i> Entrada:</label>
+                <label for="entry_time">Entrada:</label>
                 <input type="time" id="entry_time" name="entry_time" required>
             </div>
 
             <div class="inputBx" style="flex-direction: row; align-items: center; gap: 14px;">
                 <label for="has_lunch" style="margin-bottom: 0;">
-                    <i class="fa-solid fa-utensils"></i> Incluir horário de almoço?
+                    Incluir horário de almoço?
                 </label>
                 <label class="switch">
                     <input type="checkbox" id="has_lunch" name="has_lunch">
@@ -36,17 +36,17 @@
 
             <div id="lunch-fields" style="display: none;">
                 <div class="inputBx">
-                    <label for="lunch_start"><i class="fa-solid fa-utensils"></i> Início do Almoço:</label>
+                    <label for="lunch_start">Início do Almoço:</label>
                     <input type="time" id="lunch_start" name="lunch_start">
                 </div>
                 <div class="inputBx">
-                    <label for="lunch_end"><i class="fa-solid fa-mug-hot"></i> Fim do Almoço:</label>
+                    <label for="lunch_end">Fim do Almoço:</label>
                     <input type="time" id="lunch_end" name="lunch_end">
                 </div>
             </div>
 
             <div class="inputBx">
-                <label for="exit_time"><i class="fa-solid fa-door-closed"></i> Saída:</label>
+                <label for="exit_time">Saída:</label>
                 <input type="time" id="exit_time" name="exit_time" required>
             </div>
             <div class="button-row">

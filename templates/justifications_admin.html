@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>Abonar Justificativas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/justifications_admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="main">
-        <h2>Justificativas Pendentes</h2>
+        <h2><i class="fa-solid fa-file-circle-question"></i> Justificativas Pendentes</h2>
         <table>
             <thead>
                 <tr>
@@ -42,7 +43,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('main.admin') }}" class="dashboard-back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+        <a href="{{ url_for('main.admin') }}" class="dashboard-back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+        </a>
     </div>
 </body>
 </html>
