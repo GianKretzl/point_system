@@ -193,6 +193,36 @@ def clock():
     punches_today = TimePunch.query.filter_by(user_id=user.id, date=now.date()).order_by(TimePunch.time).all()
     if request.method == 'POST':
         punch_type = request.form.get('punch_type')
+        # Busca as últimas batidas do dia
+        entry = next((p for p in punches_today if p.punch_type == 'entry'), None)
+        lunch_start = next((p for p in punches_today if p.punch_type == 'lunch_start'), None)
+        lunch_end = next((p for p in punches_today if p.punch_type == 'lunch_end'), None)
+        exit_ = next((p for p in punches_today if p.punch_type == 'exit'), None)
+
+        if punch_type == 'entry':
+            pass  # Sempre pode bater entrada
+        elif punch_type == 'lunch_start':
+            if not entry:
+                flash('Registre a entrada antes de iniciar o almoço!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+            if now.time() <= entry.time:
+                flash('O início do almoço deve ser após a entrada!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+        elif punch_type == 'lunch_end':
+            if not lunch_start:
+                flash('Registre o início do almoço antes de finalizar!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+            if now.time() <= lunch_start.time:
+                flash('O fim do almoço deve ser após o início do almoço!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+        elif punch_type == 'exit':
+            if not entry:
+                flash('Registre a entrada antes da saída!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+            if now.time() <= entry.time:
+                flash('O horário de saída deve ser após a entrada!', 'danger')
+                return render_template('employee_clock.html', username=user.username, is_admin=session.get('is_admin'), punches_today=punches_today)
+
         if punch_type in ['entry', 'exit', 'lunch_start', 'lunch_end']:
             punch = TimePunch(
                 user_id=user.id,
