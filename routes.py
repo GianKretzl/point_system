@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session, send_file
-from models import EmployeeSchedule, User, TimeRecord, Justification
+from models import EmployeeSchedule, User, Justification, TimePunch
 from forms import LoginForm
 from datetime import datetime, timedelta
 from db import db
@@ -46,7 +46,7 @@ def admin():
     if not session.get('username') or not session.get('is_admin'):
         return redirect(url_for('main.login'))
     total_employees = User.query.filter_by(is_employee=True).count()
-    total_records_today = TimeRecord.query.filter(TimeRecord.date == datetime.today().date()).count()
+    total_records_today = TimePunch.query.filter(TimePunch.date == datetime.today().date()).count()
     total_justifications_pending = Justification.query.filter_by(status='pendente').count() if hasattr(Justification, 'status') else 0
     total_absences_today = get_total_absences_today()
     return render_template(
@@ -68,22 +68,22 @@ def employee():
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
     today = datetime.today()
-    records_this_month = TimeRecord.query.filter(
-        TimeRecord.user_id == user.id,
-        TimeRecord.date >= today.replace(day=1).date(),
-        TimeRecord.date <= today.date()
+    punches_this_month = TimePunch.query.filter(
+        TimePunch.user_id == user.id,
+        TimePunch.date >= today.replace(day=1).date(),
+        TimePunch.date <= today.date()
     ).count()
-    absences_this_month = get_employee_absences(user.id, today.year, today.month)
     justifications_sent = Justification.query.filter_by(user_id=user.id).count()
-    last_record = TimeRecord.query.filter_by(user_id=user.id).order_by(TimeRecord.date.desc()).first()
-    last_record_str = last_record.date.strftime('%d/%m/%Y') if last_record else '-'
+    last_punch = TimePunch.query.filter_by(user_id=user.id).order_by(TimePunch.date.desc(), TimePunch.time.desc()).first()
+    last_punch_str = last_punch.date.strftime('%d/%m/%Y') if last_punch else '-'
+    absences_this_month = get_employee_absences(user.id, today.year, today.month)
     return render_template(
         'employee.html',
         username=user.username,
-        records_this_month=records_this_month,
+        records_this_month=punches_this_month,
         absences_this_month=absences_this_month,
         justifications_sent=justifications_sent,
-        last_record=last_record_str
+        last_record=last_punch_str
     )
 
 # Cadastro de funcionários (admin)
@@ -138,12 +138,35 @@ def employee_schedule():
             flash('Preencha os campos obrigatórios: Funcionário, Entrada e Saída!', 'danger')
             return render_template('employee_schedule.html', users=users)
 
+        # Conversão para time
+        entry_time_obj = datetime.strptime(entry_time, '%H:%M').time()
+        exit_time_obj = datetime.strptime(exit_time, '%H:%M').time()
+        lunch_start_obj = datetime.strptime(lunch_start, '%H:%M').time() if lunch_start else None
+        lunch_end_obj = datetime.strptime(lunch_end, '%H:%M').time() if lunch_end else None
+
+        # Validações de lógica
+        if exit_time_obj <= entry_time_obj:
+            flash('O horário de saída deve ser maior que o de entrada!', 'danger')
+            return render_template('employee_schedule.html', users=users)
+
+        if lunch_start_obj and lunch_start_obj <= entry_time_obj:
+            flash('O início do almoço deve ser após o horário de entrada!', 'danger')
+            return render_template('employee_schedule.html', users=users)
+
+        if lunch_end_obj and lunch_start_obj and lunch_end_obj <= lunch_start_obj:
+            flash('O fim do almoço deve ser após o início do almoço!', 'danger')
+            return render_template('employee_schedule.html', users=users)
+
+        if lunch_end_obj and lunch_end_obj <= entry_time_obj:
+            flash('O fim do almoço deve ser após o horário de entrada!', 'danger')
+            return render_template('employee_schedule.html', users=users)
+
         schedule = EmployeeSchedule(
             user_id=user_id,
-            entry_time=datetime.strptime(entry_time, '%H:%M').time(),
-            lunch_start=datetime.strptime(lunch_start, '%H:%M').time() if lunch_start else None,
-            lunch_end=datetime.strptime(lunch_end, '%H:%M').time() if lunch_end else None,
-            exit_time=datetime.strptime(exit_time, '%H:%M').time()
+            entry_time=entry_time_obj,
+            lunch_start=lunch_start_obj,
+            lunch_end=lunch_end_obj,
+            exit_time=exit_time_obj
         )
         db.session.add(schedule)
         db.session.commit()
@@ -163,36 +186,31 @@ def logout():
 # Registro de ponto (funcionário/admin)
 @bp.route('/clock', methods=['GET', 'POST'])
 def clock():
-    """
-    Permite ao funcionário/admin registrar batidas de ponto (entrada, almoço, saída).
-    """
     if not session.get('username') or not (session.get('is_employee') or session.get('is_admin')):
         return redirect(url_for('main.login'))
     user = User.query.filter_by(username=session.get('username')).first()
     now = datetime.now()
-    record = TimeRecord.query.filter_by(user_id=user.id, date=now.date()).first()
+    punches_today = TimePunch.query.filter_by(user_id=user.id, date=now.date()).order_by(TimePunch.time).all()
     if request.method == 'POST':
         punch_type = request.form.get('punch_type')
-        if not record:
-            record = TimeRecord(user_id=user.id, date=now.date())
-            db.session.add(record)
-        if punch_type == 'entry':
-            record.entry_time = now.time()
-        elif punch_type == 'lunch_start':
-            record.lunch_start = now.time()
-        elif punch_type == 'lunch_end':
-            record.lunch_end = now.time()
-        elif punch_type == 'exit':
-            record.exit_time = now.time()
-        db.session.commit()
-        flash('Ponto registrado!', 'success')
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render_template('employee_clock_partial.html', username=user.username, is_admin=session.get('is_admin'))
+        if punch_type in ['entry', 'exit', 'lunch_start', 'lunch_end']:
+            punch = TimePunch(
+                user_id=user.id,
+                date=now.date(),
+                time=now.time(),
+                punch_type=punch_type
+            )
+            db.session.add(punch)
+            db.session.commit()
+            flash('Ponto registrado!', 'success')
+        else:
+            flash('Tipo de batida inválido!', 'danger')
+        punches_today = TimePunch.query.filter_by(user_id=user.id, date=now.date()).order_by(TimePunch.time).all()
     return render_template(
         'employee_clock.html',
         username=user.username,
         is_admin=session.get('is_admin'),
-        record=record  # <-- Adicione esta linha
+        punches_today=punches_today
     )
 
 # Justificativa de ausência/atraso (funcionário/admin)
@@ -268,19 +286,19 @@ def reports():
 
     if is_admin:
         users = User.query.filter_by(is_employee=True).all()
-        query = TimeRecord.query
+        query = TimePunch.query
         if selected_user:
-            query = query.filter(TimeRecord.user_id == selected_user)
+            query = query.filter(TimePunch.user_id == selected_user)
     else:
         user = User.query.filter_by(username=session.get('username')).first()
-        query = TimeRecord.query.filter(TimeRecord.user_id == user.id)
+        query = TimePunch.query.filter(TimePunch.user_id == user.id)
 
     if start_date:
-        query = query.filter(TimeRecord.date >= start_date)
+        query = query.filter(TimePunch.date >= start_date)
     if end_date:
-        query = query.filter(TimeRecord.date <= end_date)
+        query = query.filter(TimePunch.date <= end_date)
 
-    query = query.order_by(TimeRecord.date.desc())
+    query = query.order_by(TimePunch.date.desc(), TimePunch.time.desc())
     records = query.all()
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -317,19 +335,19 @@ def download_report():
     end_date = request.args.get('end_date')
 
     if is_admin:
-        query = TimeRecord.query
+        query = TimePunch.query
         if user_id:
-            query = query.filter(TimeRecord.user_id == user_id)
+            query = query.filter(TimePunch.user_id == user_id)
     else:
         user = User.query.filter_by(username=session.get('username')).first()
-        query = TimeRecord.query.filter(TimeRecord.user_id == user.id)
+        query = TimePunch.query.filter(TimePunch.user_id == user.id)
 
     if start_date:
-        query = query.filter(TimeRecord.date >= start_date)
+        query = query.filter(TimePunch.date >= start_date)
     if end_date:
-        query = query.filter(TimeRecord.date <= end_date)
+        query = query.filter(TimePunch.date <= end_date)
 
-    query = query.order_by(TimeRecord.date.desc())
+    query = query.order_by(TimePunch.date.desc(), TimePunch.time.desc())
     records = query.all()
 
     # Cria planilha XLS
@@ -341,7 +359,7 @@ def download_report():
     columns = []
     if is_admin:
         columns.append('Funcionário')
-    columns += ['Data', 'Entrada', 'Início Almoço', 'Fim Almoço', 'Saída']
+    columns += ['Data', 'Hora', 'Tipo']
 
     # Cabeçalho
     for col_num, column_title in enumerate(columns):
@@ -355,10 +373,8 @@ def download_report():
             ws.write(row_num, col, record.user.name)
             col += 1
         ws.write(row_num, col, record.date.strftime('%d/%m/%Y'))
-        ws.write(row_num, col+1, record.entry_time.strftime('%H:%M') if record.entry_time else '-')
-        ws.write(row_num, col+2, record.lunch_start.strftime('%H:%M') if record.lunch_start else '-')
-        ws.write(row_num, col+3, record.lunch_end.strftime('%H:%M') if record.lunch_end else '-')
-        ws.write(row_num, col+4, record.exit_time.strftime('%H:%M') if record.exit_time else '-')
+        ws.write(row_num, col+1, record.time.strftime('%H:%M:%S'))
+        ws.write(row_num, col+2, record.punch_type)
 
     wb.save(output)
     output.seek(0)
@@ -386,12 +402,12 @@ def get_employee_absences(user_id, year, month):
     """Retorna o número de faltas do funcionário no mês."""
     from calendar import monthrange
     workdays = get_workdays_in_month(year, month)
-    records = TimeRecord.query.filter(
-        TimeRecord.user_id == user_id,
-        TimeRecord.date >= datetime(year, month, 1).date(),
-        TimeRecord.date <= datetime(year, month, monthrange(year, month)[1]).date()
-    ).with_entities(TimeRecord.date).all()
-    recorded_days = {r.date for r in records}
+    punches = TimePunch.query.filter(
+        TimePunch.user_id == user_id,
+        TimePunch.date >= datetime(year, month, 1).date(),
+        TimePunch.date <= datetime(year, month, monthrange(year, month)[1]).date()
+    ).with_entities(TimePunch.date).distinct().all()
+    recorded_days = {p.date for p in punches}
     absences = [d for d in workdays if d not in recorded_days]
     return len(absences)
 
@@ -402,8 +418,8 @@ def get_total_absences_today():
     employees = User.query.filter_by(is_employee=True).all()
     total = 0
     for emp in employees:
-        has_record = TimeRecord.query.filter_by(user_id=emp.id, date=today).first()
-        if not has_record:
+        has_punch = TimePunch.query.filter_by(user_id=emp.id, date=today).first()
+        if not has_punch:
             total += 1
     return total
 

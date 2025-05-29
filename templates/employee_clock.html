@@ -24,19 +24,17 @@
         <div class="mini-report">
             <h3>Batidas de hoje</h3>
             <ul>
-                {% if record and record.entry_time %}
-                    <li>Entrada: {{ record.entry_time.strftime('%H:%M:%S') }}</li>
-                {% endif %}
-                {% if record and record.lunch_start %}
-                    <li>Início Almoço: {{ record.lunch_start.strftime('%H:%M:%S') }}</li>
-                {% endif %}
-                {% if record and record.lunch_end %}
-                    <li>Fim Almoço: {{ record.lunch_end.strftime('%H:%M:%S') }}</li>
-                {% endif %}
-                {% if record and record.exit_time %}
-                    <li>Saída: {{ record.exit_time.strftime('%H:%M:%S') }}</li>
-                {% endif %}
-                {% if not record or (not record.entry_time and not record.lunch_start and not record.lunch_end and not record.exit_time) %}
+                {% if punches_today and punches_today|length > 0 %}
+                    {% for punch in punches_today %}
+                        <li>
+                            {% if punch.punch_type == 'entry' %}Entrada{% endif %}
+                            {% if punch.punch_type == 'exit' %}Saída{% endif %}
+                            {% if punch.punch_type == 'lunch_start' %}Início Almoço{% endif %}
+                            {% if punch.punch_type == 'lunch_end' %}Fim Almoço{% endif %}
+                            : {{ punch.time.strftime('%H:%M:%S') }}
+                        </li>
+                    {% endfor %}
+                {% else %}
                     <li>Nenhuma batida registrada hoje.</li>
                 {% endif %}
             </ul>

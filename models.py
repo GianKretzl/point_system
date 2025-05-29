@@ -30,23 +30,6 @@ class EmployeeSchedule(db.Model):
     def __repr__(self):
         return f'<EmployeeSchedule {self.user_id}>'
 
-# Tabela de Registros de Ponto (batidas diárias)
-class TimeRecord(db.Model):
-    __tablename__ = 'time_records'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # FK para User
-    date = db.Column(db.Date, nullable=False)  # Data do registro
-    entry_time = db.Column(db.Time)            # Horário de entrada batido
-    lunch_start = db.Column(db.Time)           # Início do almoço batido
-    lunch_end = db.Column(db.Time)             # Fim do almoço batido
-    exit_time = db.Column(db.Time)             # Saída batida
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', backref='time_records')
-
-    def __repr__(self):
-        return f'<TimeRecord {self.user_id} {self.date}>'
-
 # Tabela de Justificativas de Ausência/Atraso
 class Justification(db.Model):
     __tablename__ = 'justifications'
@@ -62,5 +45,20 @@ class Justification(db.Model):
 
     def __repr__(self):
         return f'<Justification {self.user_id} {self.date} {self.status}>'
+
+# Tabela de Batidas de Ponto (entrada/saída e intervalos)
+class TimePunch(db.Model):
+    __tablename__ = 'time_punches'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    punch_type = db.Column(db.String(20), nullable=False)  # 'entry', 'exit', 'lunch_start', 'lunch_end'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='time_punches')
+
+    def __repr__(self):
+        return f'<TimePunch {self.user_id} {self.date} {self.punch_type} {self.time}>'
 
 
