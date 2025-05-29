@@ -70,6 +70,17 @@ body {
     font-weight: 500;
 }
 
+.inputBx label i {
+    margin-right: 7px;
+    color: #fff; /* Ícone branco */
+    font-size: 1.08em;
+    vertical-align: middle;
+}
+
+.inputBx label i.fa-calendar-day {
+    color: #fff !important;
+}
+
 .inputBx input[type="date"],
 .inputBx textarea {
     background: var(--background-dark);
@@ -121,6 +132,13 @@ body {
     margin-bottom: 0;
 }
 
+.button-row button i,
+.button-row a i {
+    margin-right: 8px;
+    font-size: 1.08em;
+    vertical-align: middle;
+}
+
 .button-row button:active,
 .button-row a:active {
     transform: scale(0.97);
@@ -131,6 +149,11 @@ body {
 .button-row button:hover,
 .button-row a:hover {
     background: var(--accent);
+    color: #fff;
+}
+
+.button-row button:hover i,
+.button-row a:hover i {
     color: #fff;
 }
 

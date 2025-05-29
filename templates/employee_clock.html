@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Registro de Ponto</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/employee_clock.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="main">
@@ -11,12 +12,12 @@
         <div class="clock-time" id="clock-time">--:--:--</div>
         <form method="POST" class="clock-form">
             <div class="button-row">
-                <button name="punch_type" value="entry" type="submit">Entrada</button>
-                <button name="punch_type" value="exit" type="submit">Saída</button>                
+                <button name="punch_type" value="entry" type="submit"><i class="fa-solid fa-door-open"></i> Entrada</button>
+                <button name="punch_type" value="exit" type="submit"><i class="fa-solid fa-door-closed"></i> Saída</button>                
             </div>
             <div class="button-row">
-                <button name="punch_type" value="lunch_start" type="submit">Início Almoço</button>
-                <button name="punch_type" value="lunch_end" type="submit">Fim Almoço</button>
+                <button name="punch_type" value="lunch_start" type="submit"><i class="fa-solid fa-utensils"></i> Início Almoço</button>
+                <button name="punch_type" value="lunch_end" type="submit"><i class="fa-solid fa-mug-hot"></i> Fim Almoço</button>
                 
             </div>
         </form>
@@ -40,11 +41,7 @@
             </ul>
         </div>
         <div class="button-row">
-            {% if is_admin %}
-                <a href="{{ url_for('main.admin') }}">Voltar</a>
-            {% else %}
-                <a href="{{ url_for('main.employee') }}">Voltar</a>
-            {% endif %}
+            <a href="{{ url_for('main.admin') if is_admin else url_for('main.employee') }}"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
         </div>
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}

@@ -35,8 +35,8 @@
                 <input type="time" id="exit_time" name="exit_time" required>
             </div>
             <div class="button-row">
-                <button type="submit">Cadastrar Horário</button>
-                <a href="{{ url_for('main.admin') }}">Voltar</a>
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Cadastrar Horário</button>
+                <a href="{{ url_for('main.admin') }}"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
             </div>
         </form>
         {% with messages = get_flashed_messages(with_categories=true) %}

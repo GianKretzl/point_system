@@ -26,8 +26,12 @@
                     <td>
                         <form method="POST" style="display:inline;">
                             <input type="hidden" name="justification_id" value="{{ j.id }}">
-                            <button type="submit" name="action" value="approve" class="dashboard-back-btn">Abonar</button>
-                            <button type="submit" name="action" value="reject" class="dashboard-back-btn" style="background:var(--accent);color:#fff;">Rejeitar</button>
+                            <button type="submit" name="action" value="approve" class="dashboard-back-btn">
+                                <i class="fa-solid fa-check"></i> Abonar
+                            </button>
+                            <button type="submit" name="action" value="reject" class="dashboard-back-btn" style="background:var(--accent);color:#fff;">
+                                <i class="fa-solid fa-xmark"></i> Rejeitar
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -38,7 +42,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('main.admin') }}" class="dashboard-back-btn">Voltar</a>
+        <a href="{{ url_for('main.admin') }}" class="dashboard-back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
     </div>
 </body>
 </html>
