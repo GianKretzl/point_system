@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from db import db
 import io
 import xlwt
+from collections import defaultdict
 
 bp = Blueprint('main', __name__)
 
@@ -315,7 +316,8 @@ def reports():
     end_date = request.form.get('end_date')
 
     if is_admin:
-        users = User.query.filter_by(is_employee=True).all()
+        # Inclui todos que são funcionários OU admin
+        users = User.query.filter((User.is_employee == True) | (User.is_admin == True)).all()
         query = TimePunch.query
         if selected_user:
             query = query.filter(TimePunch.user_id == selected_user)
@@ -328,8 +330,35 @@ def reports():
     if end_date:
         query = query.filter(TimePunch.date <= end_date)
 
-    query = query.order_by(TimePunch.date.desc(), TimePunch.time.desc())
-    records = query.all()
+    query = query.order_by(TimePunch.date.desc(), TimePunch.time.asc())
+    punches = query.all()
+
+    # Agrupa por data e usuário, agora com listas de horários
+    grouped = defaultdict(lambda: {
+        'user': None,
+        'date': None,
+        'entry_times': [],
+        'lunch_start_times': [],
+        'lunch_end_times': [],
+        'exit_times': []
+    })
+
+    for punch in punches:
+        key = (punch.user_id, punch.date)
+        if grouped[key]['user'] is None:
+            grouped[key]['user'] = punch.user
+            grouped[key]['date'] = punch.date
+        if punch.punch_type == 'entry':
+            grouped[key]['entry_times'].append(punch.time.strftime('%H:%M'))
+        elif punch.punch_type == 'lunch_start':
+            grouped[key]['lunch_start_times'].append(punch.time.strftime('%H:%M'))
+        elif punch.punch_type == 'lunch_end':
+            grouped[key]['lunch_end_times'].append(punch.time.strftime('%H:%M'))
+        elif punch.punch_type == 'exit':
+            grouped[key]['exit_times'].append(punch.time.strftime('%H:%M'))
+
+    # Ordena por data decrescente
+    records = sorted(grouped.values(), key=lambda x: x['date'], reverse=True)
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render_template(

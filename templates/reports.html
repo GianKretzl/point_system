@@ -62,10 +62,34 @@
                         <td>{{ record.user.name }}</td>
                         {% endif %}
                         <td>{{ record.date.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ record.entry_time.strftime('%H:%M') if record.entry_time else '-' }}</td>
-                        <td>{{ record.lunch_start.strftime('%H:%M') if record.lunch_start else '-' }}</td>
-                        <td>{{ record.lunch_end.strftime('%H:%M') if record.lunch_end else '-' }}</td>
-                        <td>{{ record.exit_time.strftime('%H:%M') if record.exit_time else '-' }}</td>
+                        <td>
+                            {% if record.entry_times %}
+                                {{ record.entry_times | join('<br>') | safe }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.lunch_start_times %}
+                                {{ record.lunch_start_times | join('<br>') | safe }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.lunch_end_times %}
+                                {{ record.lunch_end_times | join('<br>') | safe }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.exit_times %}
+                                {{ record.exit_times | join('<br>') | safe }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
