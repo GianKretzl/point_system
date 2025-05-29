@@ -113,31 +113,43 @@ form {
 .password-input-wrapper {
     position: relative;
     width: 100%;
-    display: flex;
-    align-items: center;
+    height: 44px; /* igual ao input */
 }
 
-.password-input-wrapper input[type="password"] {
+.password-input-wrapper input[type="password"],
+.password-input-wrapper input[type="text"] {
     width: 100%;
     border-radius: 18px;
-    padding-right: 36px; /* espaço para o botão do olho */
+    padding: 12px 44px 12px 38px;
     border: 1.5px solid var(--primary);
+    font-size: 1.08em;
+    background: var(--background-dark);
+    color: var(--text);
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    height: 44px;
+    line-height: 20px;
 }
 
 .password-eye-btn {
     position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: -22%; 
+    right: 15px;
+    transform: translateY(-50%); /* Ajuste fino para centralização */
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     cursor: pointer;
     color: var(--primary);
     padding: 0;
-    display: flex;
-    align-items: center;
-    font-size: 1.15em;
-    height: 24px;
+    margin: 0;
+    font-size: 1.25em;
+    z-index: 2;
 }
 
 .button-row {
